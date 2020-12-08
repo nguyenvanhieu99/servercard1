@@ -223,7 +223,7 @@ public class loginHandler implements Runnable {
                     }
                 }else if(so == Command.CONTINUE){
                     if(uso.isCheck()){
-                        log("dit me m");
+                        log("choi tiep");
                     }else{
                         
                         listroom.get(soban).can(so);
