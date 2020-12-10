@@ -17,12 +17,14 @@ public class ThreeCard implements Serializable{
     public int card2;
     public int card3;
     public int sum;
+    public int tt;
 
     public ThreeCard(int card1, int card2, int card3) {
         this.card1 = card1;
         this.card2 = card2;
         this.card3 = card3;
         this.sum = card1 + card2 + card3;
+        
     }
 
     public ThreeCard() {
@@ -88,4 +90,12 @@ public class ThreeCard implements Serializable{
         this.sum = sum;
     }
 
+    public void setTt(int tt) {
+        this.tt = tt;
+    }
+
+    public int getTt() {
+        return tt;
+    }
+    
 }

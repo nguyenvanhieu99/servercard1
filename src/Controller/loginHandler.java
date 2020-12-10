@@ -76,9 +76,9 @@ public class loginHandler implements Runnable {
                 // Object obj = dis.readObject();
                 userSendObject uso = ReceiveData();
                 so = uso.getCommand();
-                
+
                 if (so == LOGIN) {
-                    
+
                     User o = (User) uso.getObject();
                     //log(o.getUserName() + " : " + o.getPassWord());
                     try {
@@ -86,7 +86,10 @@ public class loginHandler implements Runnable {
                             serverSendObject d = new serverSendObject(LOGIN, true, o);
                             sendData(d);
                             log("da gui");
-                            Status sta = new Status(o.getUserName(), "wating", dem);
+                            UserDAO udao=new UserDAO();
+                           int di= udao.getdem(o.getUserName());
+                                    
+                            Status sta = new Status(o.getUserName(), "wating", di);
                             sta.setId(dem);
                             this.status = sta;
                             al.add(this);
@@ -128,44 +131,54 @@ public class loginHandler implements Runnable {
                             sso = new serverSendObject(Command.invite, true, this.status);
                             al.get(i).sendData(sso);
                             log(sso.toString());
-                                
+
                         }
                     }
 
                 } else if (so == Command.CREATTABLE) {
-//                    table ta = new table();
-//                    ta.add(status.getName(), this);
-//                    listtable.put(status.getName(), ta);
+                    r = new Room();
+                    r.setId(getStatus().getId());
+                    r.addLoginHandle(this);
+
+                    //Status t = (Status) uso.getObject();
+                    serverSendObject sso;
+                    listroom.add(r);
 
                 } else if (so == Command.JOINTABLE) {
-                    ArrayList d = uso.getList();
-                    Status st = (Status) d.get(0);
-                    // Thread k=new Room();
+                    Status t = (Status) uso.getObject();
+                    int b = Integer.parseInt(t.getName());
+                    int term=0;
+                    for(int i=0;i<listroom.size();i++){
+                        if(listroom.get(i).getId()==b){
+                            term=i;
+                        }
+                    }
+                    boolean addLoginHandle = listroom.get(term).addLoginHandle(this);
+                    ArrayList<Object> st1 = listroom.get(term).getAllStatus();
+                    serverSendObject ss1 = new serverSendObject(Command.JOINTABLE, true,(Object)t,st1);
+                    for (int i = 0; i < listroom.get(term).getAllh().size(); i++) {
+                        System.out.println("Controller.loginHandler.run()");
+                        listroom.get(term).getAllh().get(i).sendData(ss1);
+                        
 
-                    //k.start();
-                    //k
-//                    for(int i=0;i<al.size();i++){
-//                        String s=al.get(i).getStatus().getName();
-//                        if(st.getName().equals(s)){
-//                            serverSendObject so=new serverSendObject(Command.CHALLENGE, islogin, st)
-//                            al.get(i).sendData(orm);
-//                            
-//                        }
-                    //}
-                    
-                    
-                    
+                    }
+
                 } else if (so == Command.LOGOUT) {
-                    
+
                     this.islogin = false;
                     //this.s.close();
                     break;
-                    
+
                 } else if (so == Command.LOGINDONE) {
                     User o = (User) uso.getObject();
+                    UserDAO udao=new UserDAO();
+                    this.getStatus().setDiem(udao.getdem(o.getUserName()));
+                            
+                    
+                    
                     //ArrayList<Status> all = getAllclient();
-                      sendAllClient(o);
-                      sendAlltable(o);
+                    sendAllClient(o);
+                    sendAlltable(o);
 
                 } else if (so == Command.RANK) {
                     getRank();
@@ -180,66 +193,72 @@ public class loginHandler implements Runnable {
                         }
                     }
                     if (uso.isCheck()) {
-                        
+
                         for (int i = 0; i < listroom.size(); i++) {
-                            log( listroom.get(i).getId()+"+"+k.getId());
+                            log(listroom.get(i).getId() + "+" + k.getId());
                             if (listroom.get(i).getId() == k.getId()) {
                                 //log("co thay");
-                                soban=i;
+                                soban = i;
                                 listroom.get(i).addLoginHandle(this);
                                 al.get(term).sendData(sso);
                             }
                         }
-                         //log("thoat for ");
+                        //log("thoat for ");
                     } else {
-                       // log("khong dong y");
+                        // log("khong dong y");
                         al.get(term).sendData(new serverSendObject(Command.CHALLENGE, false, k));
 
                     }
                 } else if (so == Command.PLAY) {
-                    User o = (User) uso.getObject();
-                    User os = new User("sas", "mk", "@gami");
+//                    User o = (User) uso.getObject();
+//                    User os = new User("sas", "mk", "@gami");
                     r.play();
                     ArrayList<Object> st1 = r.getAllStatus();
 
+                    UserDAO udao = new UserDAO();
                     String[] f = new String[4];
                     ThreeCard[] tc = new ThreeCard[4];
                     for (int i = 0; i < st1.size(); i++) {
                         Status stss = (Status) st1.get(i);
-                        log(stss.toString2());
-                        f[i]=""+stss.toString3();
-                        log(stss.toString3());
-                        tc[i]=stss.toString4();
-                        //log(stss.toString4());
-                        // 
+                        f[i] = "" + stss.toString3();
+                        tc[i] = stss.toString4();
+                        udao.update(tc[i].getTt(), stss.getName());
+                        r.getAllh().get(i).getStatus().setDiem(udao.getdem(stss.getName()));
+
                     }
                     Stringsend stsen = new Stringsend(f, so, tc);
                     serverSendObject ss1 = new serverSendObject(Command.PLAY, true, stsen, st1);
                     for (int i = 0; i < r.getAllh().size(); i++) {
 
                         r.getAllh().get(i).sendData(ss1);
-                        r.getAllh().get(i);
+                       
 
                     }
-                }else if(so == Command.CONTINUE){
-                    if(uso.isCheck()){
+                } else if (so == Command.CONTINUE) {
+                    if (uso.isCheck() || listroom.size() == 0) {
                         log("choi tiep");
-                    }else{
-                        
-                        listroom.get(soban).can(so);
-                        listroom.remove(soban);   
+                    } else {
+                        boolean rt = true;
+                        for (int i = 0; i < listroom.get(soban).getAllh().size(); i++) {
+                            if (listroom.get(soban).getAllh().get(i).getStatus().getId() == this.getStatus().getId()) {
+                                listroom.get(soban).can(so);
+                                listroom.remove(soban);
+                                break;
+                            }
+                        }
+
                     }
                 }
-                
+
             }
 
             try {
-//                for (int i = 0; i < al.size(); i++) {
-//                    if (al.get(i).getStatus().getId() == getStatus().getId()) {
-//                        al.remove(i);
-//                    }
-//
-//                }
+                for (int i = 0; i < al.size(); i++) {
+                    if (al.get(i).getStatus().getId() == getStatus().getId()) {
+                        al.remove(i);
+                    }
+
+                }
                 //s.close();
                 this.ois.close();
                 this.oos.close();
@@ -264,8 +283,6 @@ public class loginHandler implements Runnable {
         }
 
     }
-
-    
 
     public ArrayList<Object> getAlltable() {
         return null;
@@ -327,6 +344,7 @@ public class loginHandler implements Runnable {
     public void log(String mess) {
         System.out.println("log: " + mess);
     }
+
     public ArrayList<Object> getAllclient() {
 
         //ArrayList<loginHandler> sd;
@@ -338,6 +356,7 @@ public class loginHandler implements Runnable {
         return as;
 
     }
+
     public ArrayList<Object> getAllRoom() {
 
         //ArrayList<loginHandler> sd;
@@ -345,28 +364,28 @@ public class loginHandler implements Runnable {
         ArrayList<Object> as = new ArrayList<>();
         Room r;
         for (int i = 0; i < listroom.size(); i++) {
-            String k="";
-            r=listroom.get(i);
-            k=r.getId()+":"+r.getAllh().get(0).getStatus().getName()+":"+r.getAllh().size();
+            String k = "";
+            r = listroom.get(i);
+            k = r.getId() + ":" + r.getAllh().get(0).getStatus().getName() + ":" + r.getAllh().size();
             as.add(k);
         }
         return as;
 
     }
- private void sendAlltable(User o) {
+
+    private void sendAlltable(User o) {
         ArrayList<Object> as = getAllRoom();
         serverSendObject sso;
         sso = new serverSendObject(Command.GETALLTABLE, true, o, as);
         sendData(sso);
     }
+
     private void sendAllClient(User o) {
         ArrayList<Object> as = getAllclient();
         serverSendObject sso;
         sso = new serverSendObject(Command.GETALLCLIENT, true, o, as);
         sendData(sso);
     }
-
-   
 
     private boolean checkUser(User user) throws ClassNotFoundException, SQLException {
         UserDAO contr = new UserDAO();

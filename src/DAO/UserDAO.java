@@ -31,10 +31,13 @@ public class UserDAO extends DAO {
         p.setString(2, u.getPassWord());
         p.setString(3, u.getEmail());
         //boolean td = p.execute();
-        int t=p.executeUpdate();
-        if(t==1) return true;
-        else return false;
-        
+        int t = p.executeUpdate();
+        if (t == 1) {
+            return true;
+        } else {
+            return false;
+        }
+
     }
 
     public boolean findbyname(String s) throws ClassNotFoundException, SQLException {
@@ -63,7 +66,38 @@ public class UserDAO extends DAO {
         }
     }
 
+    public boolean update(int d, String name) throws ClassNotFoundException, SQLException {
+        String q = "Update user SET num=num+? WHERE username = ?";
+        PreparedStatement p = getConnect().prepareStatement(q);
+        //log(u.getUserName() + ":" + u.getPassWord());
+        p.setInt(1, d);
+        p.setString(2, name);
+        int rs = p.executeUpdate();
+        
+        if (rs>0) {
+            return true;
+        }else {
+            return false;
+        }
+
+    }
+
     public void log(String s) {
         System.out.println(s);
+    }
+
+    public int getdem(String userName) throws ClassNotFoundException, SQLException {
+         String checklogin = "SELECT num FROM user WHERE username = ? ";
+        PreparedStatement p = getConnect().prepareStatement(checklogin);
+        //log(u.getUserName() + ":" + u.getPassWord());
+        p.setString(1, userName);
+        ResultSet rs = p.executeQuery();
+
+        if (rs.next()) {
+            return rs.getInt("num");
+          
+        } else {
+            return 0;
+        }
     }
 }

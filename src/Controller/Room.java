@@ -5,11 +5,13 @@
  */
 package Controller;
 
+import java.nio.file.Files;
 import java.util.ArrayList;
 import model.Cards;
 import model.Status;
 import model.ThreeCard;
 import model.serverSendObject;
+import sun.security.util.Length;
 
 /**
  *
@@ -18,7 +20,7 @@ import model.serverSendObject;
 public class Room implements Runnable{
     public ArrayList <loginHandler> allh;
     public int id;
-
+    
     public Room(ArrayList<loginHandler> allh, int id) {
         this.allh = allh;
         this.id = id;
@@ -78,14 +80,25 @@ public class Room implements Runnable{
     void play() {
         Cards ca=new  Cards();
         ThreeCard thc;
+        int term1=allh.size();
+        int[] k=new int[term1] ; 
         for(int i=0;i<allh.size();i++)    {
+            
             thc=ca.getThreeCard();
             String term=thc.allnum();
             allh.get(i).getStatus().setThreecard(thc);
             allh.get(i).getStatus().setAllnum(term);
            // System.out.println(term);
+           k[i]=thc.getSum();
             
         }
+        int[] mtt=gettt(k);
+        for(int i=0;i<allh.size();i++)    {
+            allh.get(i).getStatus().getThreecard().setTt(mtt[i]);
+            
+            
+            
+        }  
     }
 
     void sendall() {
@@ -105,6 +118,20 @@ public class Room implements Runnable{
     }
     private void  log(String s){
         System.out.println(s);
+    }
+
+    private int[] gettt(int[] k) {
+        int t=k.length;
+        int [] rs=new int[t];
+        for(int i=0;i<k.length;i++){
+            rs[i]=1;
+            for(int j=0;j<k.length;j++){
+                if(i!=j&&k[i]>k[j]){
+                    rs[i]++;
+                }
+            }
+        }
+        return rs;
     }
     
 
