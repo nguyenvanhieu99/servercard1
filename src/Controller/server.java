@@ -40,7 +40,7 @@ public class server implements Command {
     static int dem = 0;
 
     public server() throws IOException {
-        control = new ServerSocket(8080);
+        control = new ServerSocket(8088);
         new Thread(() -> {
             while (true) {
                 try {

@@ -82,6 +82,7 @@ public class loginHandler implements Runnable {
                     User o = (User) uso.getObject();
                     //log(o.getUserName() + " : " + o.getPassWord());
                     try {
+                        
                         if (checkUser(o)) {
                             serverSendObject d = new serverSendObject(LOGIN, true, o);
                             sendData(d);
@@ -171,15 +172,12 @@ public class loginHandler implements Runnable {
 
                 } else if (so == Command.LOGINDONE) {
                     User o = (User) uso.getObject();
-                    UserDAO udao=new UserDAO();
-                    this.getStatus().setDiem(udao.getdem(o.getUserName()));
-                            
-                    
-                    
+//                    UserDAO udao=new UserDAO();
+//                    this.getStatus().setDiem(udao.getdem(o.getUserName()));
                     //ArrayList<Status> all = getAllclient();
                     sendAllClient(o);
                     sendAlltable(o);
-
+                    sendAllUser(o);
                 } else if (so == Command.RANK) {
                     getRank();
 
@@ -381,15 +379,20 @@ public class loginHandler implements Runnable {
     }
 
     private void sendAllClient(User o) {
+        
         ArrayList<Object> as = getAllclient();
         serverSendObject sso;
         sso = new serverSendObject(Command.GETALLCLIENT, true, o, as);
         sendData(sso);
+        
     }
 
     private boolean checkUser(User user) throws ClassNotFoundException, SQLException {
+        
         UserDAO contr = new UserDAO();
-
+        for(int i=0;i<al.size();i++){
+            if(user.getUserName().equals(al.get(id).getStatus())) return false;
+        }
         if (contr.checkLogin(user)) {
             return true;
         } else {
@@ -408,6 +411,20 @@ public class loginHandler implements Runnable {
         log("sai roi");
         return false;
 
+    }
+
+    private void sendAllUser(User o) {
+        UserDAO udao=new UserDAO();
+        
+        ArrayList<Status> as = udao.getAlluser();
+        ArrayList<Object> ass=new ArrayList<>();
+        for(int i=0;i<as.size();i++){
+            Object d=as.get(i);
+            ass.add(d);
+        }
+        serverSendObject sso;
+        sso = new serverSendObject(Command.RANK, true, o, ass);
+        sendData(sso);
     }
 
 }

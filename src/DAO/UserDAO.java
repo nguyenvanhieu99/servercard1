@@ -9,6 +9,8 @@ import model.User;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import model.Status;
 
 /**
  *
@@ -23,7 +25,9 @@ public class UserDAO extends DAO {
     public boolean register(User u) throws ClassNotFoundException, SQLException {
         String s = u.getUserName();
         if (findbyname(s)) {
+            
             return false;
+            
         }
         String checklogin = "INSERT INTO user(username,password,email) VALUES (?,?,?)";
         PreparedStatement p = getConnect().prepareStatement(checklogin);
@@ -33,7 +37,10 @@ public class UserDAO extends DAO {
         //boolean td = p.execute();
         int t = p.executeUpdate();
         if (t == 1) {
+            
+            
             return true;
+            
         } else {
             return false;
         }
@@ -45,6 +52,7 @@ public class UserDAO extends DAO {
         PreparedStatement p = getConnect().prepareStatement(query);
         p.setString(1, s);
         ResultSet rs = p.executeQuery();
+        
         if (rs.next()) {
             return true;
         }
@@ -52,6 +60,7 @@ public class UserDAO extends DAO {
     }
 
     public boolean checkLogin(User u) throws ClassNotFoundException, SQLException {
+        
         String checklogin = "SELECT * FROM user WHERE username = ? and password = ?";
         PreparedStatement p = getConnect().prepareStatement(checklogin);
         //log(u.getUserName() + ":" + u.getPassWord());
@@ -100,4 +109,28 @@ public class UserDAO extends DAO {
             return 0;
         }
     }
+   
+    public ArrayList<Status> getAlluser() {
+        PreparedStatement pst;
+        String query = "select * from user order by num DESC";
+        ArrayList<Status> lncc = new ArrayList<>();
+        Status ncc;
+        try {
+            pst = getConnect().prepareStatement(query);
+            ResultSet rs = pst.executeQuery();
+            while (rs.next()) {
+                ncc = new Status();
+                ncc.setId(rs.getInt("id"));
+                ncc.setName(rs.getString("username"));
+                ncc.setStatus(rs.getNString("email"));
+                ncc.setDiem(rs.getInt("num"));
+                //log(ncc.toString());
+                lncc.add(ncc);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return lncc;
+    }
+    
 }

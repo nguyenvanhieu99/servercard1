@@ -95,9 +95,6 @@ public class Room implements Runnable{
         int[] mtt=gettt(k);
         for(int i=0;i<allh.size();i++)    {
             allh.get(i).getStatus().getThreecard().setTt(mtt[i]);
-            
-            
-            
         }  
     }
 
@@ -126,7 +123,8 @@ public class Room implements Runnable{
         for(int i=0;i<k.length;i++){
             rs[i]=1;
             for(int j=0;j<k.length;j++){
-                if(i!=j&&k[i]>k[j]){
+                
+                if(i!=j&& (k[i]%10) > (k[j]%10) ){
                     rs[i]++;
                 }
             }
