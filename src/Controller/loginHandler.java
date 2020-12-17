@@ -30,7 +30,6 @@ import model.Stringsend;
 import model.ThreeCard;
 import model.User;
 import model.serverSendObject;
-import model.userIO;
 import model.table;
 import model.userSendObject;
 
@@ -158,10 +157,10 @@ public class loginHandler implements Runnable {
                     ArrayList<Object> st1 = listroom.get(term).getAllStatus();
                     serverSendObject ss1 = new serverSendObject(Command.JOINTABLE, true,(Object)t,st1);
                     for (int i = 0; i < listroom.get(term).getAllh().size(); i++) {
+                        
                         System.out.println("Controller.loginHandler.run()");
                         listroom.get(term).getAllh().get(i).sendData(ss1);
                         
-
                     }
 
                 } else if (so == Command.LOGOUT) {
